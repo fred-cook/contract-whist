@@ -27,13 +27,13 @@ class Game:
         the exception that the sum of the bids can't
         match the total tricks available.
         """
-        options = set(range(len(hands) + 1))
+        options = set(range(len(hands[0]) + 1))
         bids = {}
         for player, hand in zip(players, hands):
             print(f"{player.name} to bid.")
             player.hand = Hand(hand)
             if player is players[-1]:  # dealer
-                if (forbidden := len(hands) - sum(bids.values())) >= 0:
+                if (forbidden := len(hands[0]) - sum(bids.values())) >= 0:
                     options.remove(forbidden)
             bids[player] = player.make_bid(options)
         return bids
@@ -67,7 +67,30 @@ class Game:
             leader_index = self.players.index(winner)
             tricks[winner] += 1
 
-        return tricks
+        return {player: score + self.CONTRACT_BONUS if score == bids[player] else score
+                for player, score in tricks.items()}
+    
+    def play_game(self) -> dict[Player, int]:
+        """
+        Play the specified number of rounds, adding the scores
+        """
+        scores = {player: 0 for player in self.players}
+        hands = [4, 2, 1, 3, 5]
+        for i, hand in enumerate(hands):
+            trump=next(self.SUIT_ORDER)
+            print(f"Round {i + 1}: {hand} cards, {trump}s are trumps")
+            print(f"{self.players[-1].name} is dealing")
+            round_result = self.play_round(num_tricks=hand,
+                                           trump=trump)
+            for player, score in round_result.items():
+                print(f"{player.name:10s} | {score:2d}")
+                scores[player] += score
+            self.players.append(self.players.pop(0)) # next dealer
+        print("Final scores:")
+        for player, score in scores.items():
+            print(f"{player.name:10s} | {score:3d}")
+
+
 
     @staticmethod
     def new_leader(winner: Player, players: list[Player]) -> list[Player]:
@@ -79,4 +102,4 @@ if __name__ == "__main__":
     players = [Player(name) for name in ["fred", "chode", "kate", "cam"]]
     game = Game(players)
 
-    x = game.play_round(5, "club")
+    x = game.play_game()
