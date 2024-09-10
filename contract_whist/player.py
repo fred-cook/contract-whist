@@ -1,3 +1,7 @@
+from collections import defaultdict
+from functools import reduce
+from operator import add
+
 from deck import Card
 
 # from trick import Trick
@@ -5,10 +9,17 @@ from deck import Card
 
 class Hand:
     def __init__(self, cards: list[Card]):
-        self.cards = cards
+        self.cards = self.sort_hand(cards)
 
     def __len__(self) -> int:
         return len(self.cards)
+
+    @staticmethod
+    def sort_hand(cards: list[Card]) -> list[Card]:
+        suits = defaultdict(list)
+        for card in cards:
+            suits[card.suit].append(card)
+        return reduce(add, map(sorted, suits.values()))
 
     @property
     def suits(self):
