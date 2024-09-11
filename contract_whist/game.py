@@ -51,6 +51,8 @@ class Trick:
         self.cards: dict[Player, Card] = {}
         self.lead_suit: str | None = None
 
+        self.winner: Player | None = None
+
     def __len__(self):
         return len(self.cards)
 
@@ -61,14 +63,15 @@ class Trick:
 
     def resolve(self) -> Player:
         for player, card in self.cards.items():
+            player.update_trick_result(self)
             print(f"{player.name:10s} | {card}")
-        (winner, winning_card), *rest = self.cards.items()
+        (self.winner, winning_card), *rest = self.cards.items()
         for player, card in rest:
             if winning_card < card:
                 winning_card = card
-                winner = player
-        print(f"{winner.name} wins with the {winning_card}")
-        return winner
+                self.winner = player
+        print(f"{self.winner.name} wins with the {winning_card}")
+        return self.winner
 
 
 class Hand:
@@ -195,11 +198,10 @@ class Game:
             for player, score in tricks.items()
         }
 
-    def play_game(self) -> dict[Player, int]:
+    def play_game(self) -> None:
         """
         Play the specified number of rounds, adding the scores
         """
-        scores = {player: 0 for player in self.players}
         hands = [4, 2, 1, 3, 5]
         for i, hand in enumerate(hands):
             trump = next(self.SUIT_ORDER)
@@ -208,11 +210,11 @@ class Game:
             round_result = self.play_round(num_tricks=hand, trump=trump)
             for player, score in round_result.items():
                 print(f"{player.name:10s} | {score:2d}")
-                scores[player] += score
+                player.update_score(score)
             self.players.append(self.players.pop(0))  # next dealer
         print("Final scores:")
-        for player, score in scores.items():
-            print(f"{player.name:10s} | {score:3d}")
+        for player in self.players:
+            print(f"{player.name:10s} | {player.points:3d}")
 
     @staticmethod
     def new_leader(winner: Player, players: list[Player]) -> list[Player]:
