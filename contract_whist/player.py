@@ -2,7 +2,7 @@ from collections import defaultdict
 from functools import reduce
 from operator import add
 
-from deck import Card
+from contract_whist.deck import Card
 
 # from trick import Trick
 

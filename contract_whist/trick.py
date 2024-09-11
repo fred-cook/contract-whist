@@ -1,5 +1,5 @@
-from deck import Card
-from player import Player
+from contract_whist.deck import Card
+from contract_whist.player import Player
 
 
 class Trick:
