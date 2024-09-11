@@ -1,7 +1,11 @@
 
-## Contract Whist
+# Contract Whist
 
 For now a command line implementation of the game contract whist
+
+### Installation
+
+If you have `poetry` installed clone this repo and run `poetry install` from inside it. Then `poetry shell`, then `python contract_whist/game.py`.
 
 ### Rules
 
