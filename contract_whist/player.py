@@ -25,13 +25,13 @@ class Hand:
     def suits(self):
         return set(card.suit for card in self.cards)
 
-    def playable(self, trick: "Trick") -> list[Card]:
+    def playable(self, trick: "Trick") -> list[int]:
         if len(trick) == 0:  # leading
-            return self.cards
+            return [1] * len(self)
         elif trick.lead_suit in self.suits:
-            return [card for card in self.cards if card.suit == trick.lead_suit]
+            return [1 if card.suit == trick.lead_suit else 0 for card in self.cards]
         else:
-            return self.cards
+            return [1] * len(self)
 
     def pop(self, index: int) -> Card:
         return self.cards.pop(index)
@@ -60,15 +60,15 @@ class Player:
     def play_card(self, trick: "Trick") -> Card:
         playable = self.hand.playable(trick)
         print(f"{self.name} choose from: played so far: {list(trick.cards.values())}")
-        for i, card in enumerate(playable):
-            print(f"{i:2d}: {card}")
+        for i, card in enumerate(self.hand.cards):
+            print(f"{i:2d}" if playable[i] else "  ", f" | {card}")
         index = -1
-        while not (0 <= index < len(self.hand)):
+        while index not in set(i for i, available in enumerate(playable) if available):
             try:
                 index = int(input("choose index: "))
             except Exception:
                 print("invalid")
-        return self.hand.pop(self.hand.cards.index(playable[index]))
+        return self.hand.pop(index)
 
     def __repr__(self):
         return self.name
