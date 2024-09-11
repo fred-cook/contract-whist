@@ -1,6 +1,7 @@
 from itertools import cycle
 
-from contract_whist.player import Player, Hand
+from contract_whist.hand import Hand
+from contract_whist.player import Player
 from contract_whist.deck import Deck, SUITS
 from contract_whist.trick import Trick
 
@@ -31,7 +32,7 @@ class Game:
         bids = {}
         for player, hand in zip(players, hands):
             print(f"{player.name} to bid.")
-            player.hand = Hand(hand)
+            player.hand = hand
             if player is players[-1]:  # dealer
                 if (forbidden := len(hands[0]) - sum(bids.values())) >= 0:
                     options.remove(forbidden)
@@ -67,9 +68,11 @@ class Game:
             leader_index = self.players.index(winner)
             tricks[winner] += 1
 
-        return {player: score + self.CONTRACT_BONUS if score == bids[player] else score
-                for player, score in tricks.items()}
-    
+        return {
+            player: score + self.CONTRACT_BONUS if score == bids[player] else score
+            for player, score in tricks.items()
+        }
+
     def play_game(self) -> dict[Player, int]:
         """
         Play the specified number of rounds, adding the scores
@@ -77,20 +80,17 @@ class Game:
         scores = {player: 0 for player in self.players}
         hands = [4, 2, 1, 3, 5]
         for i, hand in enumerate(hands):
-            trump=next(self.SUIT_ORDER)
+            trump = next(self.SUIT_ORDER)
             print(f"Round {i + 1}: {hand} cards, {trump}s are trumps")
             print(f"{self.players[-1].name} is dealing")
-            round_result = self.play_round(num_tricks=hand,
-                                           trump=trump)
+            round_result = self.play_round(num_tricks=hand, trump=trump)
             for player, score in round_result.items():
                 print(f"{player.name:10s} | {score:2d}")
                 scores[player] += score
-            self.players.append(self.players.pop(0)) # next dealer
+            self.players.append(self.players.pop(0))  # next dealer
         print("Final scores:")
         for player, score in scores.items():
             print(f"{player.name:10s} | {score:3d}")
-
-
 
     @staticmethod
     def new_leader(winner: Player, players: list[Player]) -> list[Player]:
