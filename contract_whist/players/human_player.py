@@ -1,17 +1,7 @@
-from os import environ
+from contract_whist.players.player import Player
 
-from contract_whist.deck import Card
-from contract_whist.hand import Hand
 
-if environ["TYPE_CHECKING"]:
-    from contract_whist.game import Trick
-
-class Player:
-    def __init__(self, name: str):
-        self.name: str = name
-        self.points: int = 0
-
-        self.hand: Hand | None = None
+class HumanPlayer(Player):
 
     def make_bid(self, options: set[int]) -> int:
         bid = -1
@@ -23,7 +13,7 @@ class Player:
                 print("invalid")
         return bid
 
-    def play_card(self, trick: Trick) -> Card:
+    def play_card(self, trick: "Trick") -> "Card":
         playable = self.hand.playable(trick)
         print(f"{self.name} choose from: played so far: {list(trick.cards.values())}")
         for i, card in enumerate(self.hand.cards):
@@ -35,6 +25,3 @@ class Player:
             except Exception:
                 print("invalid")
         return self.hand.pop(index)
-
-    def __repr__(self):
-        return self.name
