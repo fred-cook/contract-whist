@@ -62,9 +62,13 @@ class Trick:
     def resolve(self) -> Player:
         for player, card in self.cards.items():
             print(f"{player.name:10s} | {card}")
-        return [
-            player for player, _ in sorted(self.cards.items(), key=lambda pair: pair[1])
-        ].pop()
+        (winner, winning_card), *rest = self.cards.items()
+        for player, card in rest:
+            if winning_card < card:
+                winning_card = card
+                winner = player
+        print(f"{winner.name} wins with the {winning_card}")
+        return winner
 
 
 class Hand:
