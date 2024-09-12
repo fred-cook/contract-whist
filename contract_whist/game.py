@@ -135,7 +135,7 @@ class Deck:
 
     def shuffle_and_deal(self, num_cards: int, num_players: int) -> list[Hand]:
         total_cards = num_cards * num_players
-        if num_cards > 0 and num_players > 0 and total_cards < len(self.cards):
+        if num_cards > 0 and num_players > 0 and total_cards <= len(self.cards):
             shuffle(self.cards)  # in place
             return [
                 Hand([self.cards[i] for i in range(j, total_cards, num_players)])
@@ -218,7 +218,7 @@ class Game:
         """
         Play the specified number of rounds, adding the scores
         """
-        hands = [12, 10, 8, 6, 4, 2, 1, 3, 5, 7, 9, 11]
+        hands = [12, 10, 8, 6, 4, 2, 1, 3, 5, 7, 9, 11, 13]
         for i, hand in enumerate(hands):
             trump = next(self.SUIT_ORDER)
             print(f"Round {i + 1}: {hand} cards, {trump}s are trumps")
