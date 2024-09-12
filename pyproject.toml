@@ -12,6 +12,8 @@ python = "^3.10"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
+numpy = "^2.1.1"
+matplotlib = "^3.9.2"
 
 [build-system]
 requires = ["poetry-core"]
