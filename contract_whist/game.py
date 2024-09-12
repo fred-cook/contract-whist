@@ -218,7 +218,7 @@ class Game:
         """
         Play the specified number of rounds, adding the scores
         """
-        hands = [4, 2, 1, 3, 5]
+        hands = [12, 10, 8, 6, 4, 2, 1, 3, 5, 7, 9, 11]
         for i, hand in enumerate(hands):
             trump = next(self.SUIT_ORDER)
             print(f"Round {i + 1}: {hand} cards, {trump}s are trumps")
@@ -231,6 +231,7 @@ class Game:
         print("Final scores:")
         for player in self.players:
             print(f"{player.name:10s} | {player.points:3d}")
+        return {player.name: player.points for player in players}
 
     @staticmethod
     def new_leader(winner: Player, players: list[Player]) -> list[Player]:
@@ -239,11 +240,19 @@ class Game:
 
 
 if __name__ == "__main__":
-    players = (
-        [HumanPlayer("Ferd")]
-        + [HeuristicPlayer("Gurple", 1.3, 0.4, 6)]
-        + [RandomPlayer(name) for name in ["Snerp", "Morsh"]]
-    )
-    game = Game(players)
+    wins = {name: 0 for name in ["Ferd", "Snerp", "Morsh", "Gurple"]}
+    cumulative = {name: 0 for name in ["Ferd", "Snerp", "Morsh", "Gurple"]}
 
-    x = game.play_game()
+    for _ in range(1000):
+        players = [HeuristicPlayer("Gurple", 1.3, 0.4, 6)] + [
+            RandomPlayer(name) for name in ["Ferd", "Snerp", "Morsh"]
+        ]
+        game = Game(players)
+
+        result = sorted(game.play_game().items(), key=lambda x: x[1], reverse=True)
+        wins[result[0][0]] += 1
+        for name, score in result:
+            cumulative[name] += score
+
+    print(wins)
+    print(cumulative)
