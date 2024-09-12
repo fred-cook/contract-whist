@@ -10,6 +10,13 @@ from contract_whist.players import Player
 
 
 class HeuristicPlayer(Player):
+    """
+    By playing the random players the best values were found to be:
+    trump_multiplier: 1.05
+    card_multiplier: 0.35
+    card_cutoff: 6
+    """
+
     def __init__(
         self,
         name: str,
@@ -35,56 +42,43 @@ class HeuristicPlayer(Player):
 
     def play_card(self, trick: Trick) -> Card:
         playable = self.hand.playable(trick)
+        playable_cards = [card for i, card in enumerate(self.hand.cards) if playable[i]]
         if sum(playable) == 1:
+            print(
+                f"{self.name} has no choice: {self.hand.cards[playable.index(1)]} from {self.hand.cards}"
+            )
             return self.hand.pop(playable.index(1))
         elif self.trick_count == self.contract:  # try and throw away cards
             if len(trick) == 0:  # playing first
-                return self.hand.pop(self.min_face_card_index(self.hand.cards))
-            else:
-                return self.hand.pop(
-                    self.hand.cards.index(
-                        self.max_losing_card(
-                            [
-                                self.hand.cards[i]
-                                for i, can_play in enumerate(playable)
-                                if can_play
-                            ]
-                        ),
-                        trick,
-                    )
-                )
-        else:  # try and win it
-            if len(trick) == 0:  # playing first
-                return self.hand.pop(self.max_face_card_index(self.hand))
-            elif (
-                card := self.can_win(
-                    [
-                        self.hand.cards[i]
-                        for i, can_play in enumerate(playable)
-                        if can_play
-                    ],
-                    trick,
-                )
-            ) is not None:
+                card = self.min_face_card(playable_cards)
+                print(f"{self.name} trying to lose with {card} from {self.hand.cards}")
                 return self.hand.pop(self.hand.cards.index(card))
             else:
-                return self.hand.pop(
-                    self.min_face_card_index(
-                        [
-                            self.hand.cards[i]
-                            for i, can_play in enumerate(playable)
-                            if can_play
-                        ]
-                    )
+                card = self.max_losing_card(playable_cards, trick)
+                print(
+                    f"{self.name} playing highest losing card from {self.hand.cards}: {card}"
                 )
+                return self.hand.pop(self.hand.cards.index(card))
+        else:  # try and win it
+            if len(trick) == 0:  # playing first
+                card = self.max_face_card(playable_cards)
+                print(f"{self.name} trying to win with {card} from {self.hand.cards}")
+                return self.hand.pop(self.hand.cards.index(card))
+            elif (card := self.can_win(playable_cards, trick)) is not None:
+                print(f"{self.name} trying to win from {self.hand.cards} with {card}")
+                return self.hand.pop(self.hand.cards.index(card))
+            else:
+                card = self.min_face_card(playable_cards)
+                print(
+                    f"{self.name} can't win, throwing away {card} for {self.hand.cards}"
+                )
+                return self.hand.pop(self.hand.cards.index(card))
 
-    def max_face_card_index(self, hand: Hand) -> int:
-        values = [card.value for card in hand.cards]
-        return values.index(max(values))
+    def max_face_card(self, cards: list[Card]) -> Card:
+        return sorted(cards, key=lambda card: card.value, reverse=True)[0]
 
-    def min_face_card_index(self, cards: list[Card]) -> int:
-        values = [card.value for card in cards]
-        return values.index(min(values))
+    def min_face_card(self, cards: list[Card]) -> Card:
+        return sorted(cards, key=lambda card: card.value)[0]
 
     def can_win(self, playable_cards: list[Card], trick: Trick) -> Card | None:
         max_card = sorted(playable_cards)[-1]
@@ -100,7 +94,6 @@ class HeuristicPlayer(Player):
         return playable_cards[-1]
 
     def evaluate_hand(self, hand: Hand) -> float:
-        print(hand)
         score = 0.0
         for card in hand.cards:
             if card.suit == card.TRUMP:
