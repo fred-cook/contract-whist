@@ -5,6 +5,9 @@ from collections import defaultdict
 from functools import reduce
 from operator import add
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 from contract_whist.players import Player, HumanPlayer, RandomPlayer, HeuristicPlayer
 
 
@@ -102,7 +105,7 @@ class Hand:
         ) + sorted([card for card in cards if card.suit == card.TRUMP])
 
     @property
-    def suits(self):
+    def suits(self) -> set[str]:
         return set(card.suit for card in self.cards)
 
     def playable(self, trick: Trick) -> list[int]:
@@ -219,6 +222,7 @@ class Game:
         Play the specified number of rounds, adding the scores
         """
         hands = [12, 10, 8, 6, 4, 2, 1, 3, 5, 7, 9, 11, 13]
+        hands = [4, 2, 1, 3, 5]
         for i, hand in enumerate(hands):
             trump = next(self.SUIT_ORDER)
             print(f"Round {i + 1}: {hand} cards, {trump}s are trumps")
@@ -239,20 +243,66 @@ class Game:
         return players[index:] + players[:index]
 
 
-if __name__ == "__main__":
-    wins = {name: 0 for name in ["Ferd", "Snerp", "Morsh", "Gurple"]}
-    cumulative = {name: 0 for name in ["Ferd", "Snerp", "Morsh", "Gurple"]}
+players = [HumanPlayer("Fred")] + [
+    HeuristicPlayer(name, 1.05, 0.35, 6) for name in ("Joe", "Tim", "Cookie")
+]
+game = Game(players)
+game.play_game()
 
-    for _ in range(1000):
-        players = [HeuristicPlayer("Gurple", 1.3, 0.4, 6)] + [
-            RandomPlayer(name) for name in ["Ferd", "Snerp", "Morsh"]
-        ]
-        game = Game(players)
+# if __name__ == "__main__":
+#     trump_multipliers = np.linspace(0.95, 1.3, 10)
+#     card_multipliers = np.linspace(0.1, 0.5, 10)
 
-        result = sorted(game.play_game().items(), key=lambda x: x[1], reverse=True)
-        wins[result[0][0]] += 1
-        for name, score in result:
-            cumulative[name] += score
+#     win_ratios = np.zeros((len(trump_multipliers), len(card_multipliers)))
+#     average_score = np.zeros((len(trump_multipliers), len(card_multipliers)))
 
-    print(wins)
-    print(cumulative)
+#     REPEATS = 1000
+
+#     for i, trump_multiplier in enumerate(trump_multipliers):
+#         for j, card_multiplier in enumerate(card_multipliers):
+#             wins = {name: 0 for name in ["Ferd", "Snerp", "Morsh", "Gurple"]}
+#             cumulative = {name: 0 for name in ["Ferd", "Snerp", "Morsh", "Gurple"]}
+
+#             for _ in range(REPEATS):
+#                 players = [
+#                     HeuristicPlayer("Gurple", trump_multiplier, card_multiplier, 6)
+#                 ] + [RandomPlayer(name) for name in ["Ferd", "Snerp", "Morsh"]]
+#                 game = Game(players)
+
+#                 result = sorted(
+#                     game.play_game().items(), key=lambda x: x[1], reverse=True
+#                 )
+#                 wins[result[0][0]] += 1
+#                 for name, score in result:
+#                     cumulative[name] += score
+#             win_ratios[i][j] = wins["Gurple"] / sum(wins.values())
+#             average_score[i][j] = cumulative["Gurple"] / REPEATS
+
+#     fig, (ax1, ax2) = plt.subplots(1, 2)
+#     ax1.imshow(win_ratios)
+#     ax1.set_xticks(
+#         np.arange(len(card_multipliers)),
+#         [f"{val:.2f}" for val in card_multipliers],
+#         rotation="vertical",
+#     )
+#     ax1.set_ylabel("trump multiplier")
+#     ax1.set_xlabel("card multiplier")
+#     ax1.set_yticks(
+#         np.arange(len(trump_multipliers)),
+#         [f"{val:.2f}" for val in trump_multipliers],
+#     )
+#     ax1.set_title("win ratio")
+#     ax2.imshow(average_score)
+#     ax2.set_ylabel("trump multiplier")
+#     ax2.set_xlabel("card multiplier")
+#     ax2.set_xticks(
+#         np.arange(len(card_multipliers)),
+#         [f"{val:.2f}" for val in card_multipliers],
+#         rotation="vertical",
+#     )
+#     ax2.set_yticks(
+#         np.arange(len(trump_multipliers)),
+#         [f"{val:.2f}" for val in trump_multipliers],
+#     )
+#     ax2.set_title("Avg score")
+#     plt.show()
