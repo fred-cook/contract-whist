@@ -15,7 +15,7 @@ class HumanPlayer(Player):
 
     def play_card(self, trick: "Trick") -> "Card":
         playable = self.hand.playable(trick)
-        print(f"{self.name} choose from: played so far: {list(trick.cards.values())}")
+        print(f"{self.name} choose from: played so far: {trick.cards}")
         for i, card in enumerate(self.hand.cards):
             print(f"{i:2d}" if playable[i] else "  ", f" | {card}")
         index = -1

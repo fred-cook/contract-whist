@@ -5,7 +5,7 @@ from collections import defaultdict
 from functools import reduce
 from operator import add
 
-from contract_whist.players import Player, HumanPlayer, RandomPlayer
+from contract_whist.players import Player, HumanPlayer, RandomPlayer, HeuristicPlayer
 
 
 Values = IntEnum(
@@ -48,7 +48,8 @@ class Card:
 class Trick:
     def __init__(self, trump: str | None):
         self.trump = trump
-        self.cards: dict[Player, Card] = {}
+        self.cards: list[Card] = []
+        self.players: list[Player] = []
         self.lead_suit: str | None = None
 
         self.winner: Player | None = None
@@ -59,24 +60,29 @@ class Trick:
     def add_card(self, player: Player, card: Card):
         if self.lead_suit is None:
             self.lead_suit = card.suit
-        self.cards[player] = card
+        self.cards.append(card)
+        self.players.append(player)
 
     def resolve(self) -> Player:
-        for player, card in self.cards.items():
-            player.update_trick_result(self)
+        for player, card in zip(self.players, self.cards):
             print(f"{player.name:10s} | {card}")
-        (self.winner, winning_card), *rest = self.cards.items()
-        for player, card in rest:
+        winning_card = self.winning_card(self.cards)
+        winner = self.players[self.cards.index(winning_card)]
+        print(f"{winner.name} wins with the {winning_card}")
+        return winner
+
+    @staticmethod
+    def winning_card(cards: list[Card]) -> Card:
+        winning_card, *rest = cards
+        for card in rest:
             if winning_card < card:
                 winning_card = card
-                self.winner = player
-        print(f"{self.winner.name} wins with the {winning_card}")
-        return self.winner
+        return winning_card
 
 
 class Hand:
     def __init__(self, cards: list[Card]):
-        self.cards = self.sort_hand(cards)
+        self.cards = sorted(self.sort_hand(cards))
 
     def __len__(self) -> int:
         return len(self.cards)
@@ -87,6 +93,13 @@ class Hand:
         for card in cards:
             suits[card.suit].append(card)
         return reduce(add, map(sorted, suits.values()))
+
+    @staticmethod
+    def sort_by_value(cards: list[Card]) -> list[Card]:
+        return sorted(
+            [card for card in cards if card.suit != card.TRUMP],
+            key=lambda card: card.value,
+        ) + sorted([card for card in cards if card.suit == card.TRUMP])
 
     @property
     def suits(self):
@@ -108,6 +121,9 @@ class Hand:
 
     def __str__(self):
         return "\n".join(["-" * 15] + list((map(str, self.cards))) + ["-" * 15])
+
+    def __repr__(self):
+        return str(self)
 
 
 class Deck:
@@ -223,9 +239,11 @@ class Game:
 
 
 if __name__ == "__main__":
-    players = [HumanPlayer("Ferd")] + [
-        RandomPlayer(name) for name in ["Gurple", "Snerp", "Morsh"]
-    ]
+    players = (
+        [HumanPlayer("Ferd")]
+        + [HeuristicPlayer("Gurple", 1.3, 0.4, 6)]
+        + [RandomPlayer(name) for name in ["Snerp", "Morsh"]]
+    )
     game = Game(players)
 
     x = game.play_game()
