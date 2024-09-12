@@ -1,14 +1,20 @@
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from contract_whist.game import Trick, Card, Hand
+from contract_whist.cards import Card
+from contract_whist.hand import Hand
+from contract_whist.trick import Trick
 
 
 class Player(ABC):
+    """
+    Base class for a player.
+
+    Contains helper methods for keeping track of the
+    player's contract, tricks and total score.
+
+    Inheritors must define a method to bid on a hand
+    and to play cards.
+    """
     def __init__(self, name: str):
         self.name: str = name
         self.points: int = 0
@@ -17,6 +23,9 @@ class Player(ABC):
         self.contract: int | None = None  # number of tricks to make
         self.trick_count = 0  # current number of tricks in the round
         self.cards_seen: list[Card] = []
+
+    def __repr__(self):
+        return self.name
 
     def update_trick_result(self, trick: Trick) -> None:
         """
@@ -48,6 +57,3 @@ class Player(ABC):
 
     @abstractmethod
     def play_card(self, trick: Trick) -> Card: ...
-
-    def __repr__(self):
-        return self.name

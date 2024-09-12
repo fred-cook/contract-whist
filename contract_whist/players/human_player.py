@@ -1,7 +1,14 @@
 from contract_whist.players.player import Player
 
+from contract_whist.trick import Trick
+from contract_whist.cards import Card
+
 
 class HumanPlayer(Player):
+    """
+    Waits for input by human for bidding and playing
+    cards.
+    """
 
     def make_bid(self, options: set[int]) -> int:
         bid = -1
@@ -13,7 +20,7 @@ class HumanPlayer(Player):
                 print("invalid")
         return bid
 
-    def play_card(self, trick: "Trick") -> "Card":
+    def play_card(self, trick: Trick) -> Card:
         playable = self.hand.playable(trick)
         print(f"{self.name} choose from: played so far: {trick.cards}")
         for i, card in enumerate(self.hand.cards):
