@@ -11,6 +11,9 @@ class HumanPlayer(Player):
     """
 
     def make_bid(self, options: set[int]) -> int:
+        """
+        Request the player to enter a bid value
+        """
         bid = -1
         print(self.hand)
         while bid not in options:
@@ -23,10 +26,12 @@ class HumanPlayer(Player):
     def play_card(self, trick: Trick) -> Card:
         playable = self.hand.playable(trick)
         print(f"{self.name} choose from: played so far: {trick.cards}")
-        for i, card in enumerate(self.hand.cards):
-            print(f"{i:2d}" if playable[i] else "  ", f" | {card}")
+        for i, card in enumerate(self.hand):
+            print(f"{i:2d}" if card in playable else "  ", f" | {card}")
         index = -1
-        while index not in set(i for i, available in enumerate(playable) if available):
+        while index not in set(
+            i for i, card in enumerate(self.hand) if card in playable
+        ):
             try:
                 index = int(input("choose index: "))
             except Exception:
