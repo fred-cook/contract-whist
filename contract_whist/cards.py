@@ -8,9 +8,10 @@ if TYPE_CHECKING:
     from contract_whist.hand import Hand
 
 Values = IntEnum(
-    "Values", list(map(str, range(2, 11))) + ["jack", "queen", "king", "ace"]
+    "Values", list(map(str, range(2, 11))) + ["jack", "queen", "king", "ace"], start=2
 )
 SUITS = ("club", "diamond", "heart", "spade")
+
 
 class Card:
     TRUMP: str | None = None
@@ -41,7 +42,7 @@ class Card:
             cls.TRUMP = suit
         else:
             raise ValueError(f"suit must be in {SUITS + (None,)} not {suit}")
-        
+
 
 class Deck:
     def __init__(self):
