@@ -1,11 +1,5 @@
-from __future__ import annotations
-
 from enum import IntEnum
 from random import shuffle
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from contract_whist.hand import Hand
 
 Values = IntEnum(
     "Values", list(map(str, range(2, 11))) + ["jack", "queen", "king", "ace"], start=2
@@ -51,12 +45,12 @@ class Deck:
     def __getitem__(self, value):
         return self.cards[value]
 
-    def shuffle_and_deal(self, num_cards: int, num_players: int) -> list[Hand]:
+    def shuffle_and_deal(self, num_cards: int, num_players: int) -> list[list[Card]]:
         total_cards = num_cards * num_players
         if num_cards > 0 and num_players > 0 and total_cards <= len(self.cards):
             shuffle(self.cards)  # in place
             return [
-                Hand([self.cards[i] for i in range(j, total_cards, num_players)])
+                [self.cards[i] for i in range(j, total_cards, num_players)]
                 for j in range(num_players)
             ]
 
