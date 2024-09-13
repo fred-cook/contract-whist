@@ -6,16 +6,20 @@ from typing import Iterator
 from contract_whist.cards import Card
 from contract_whist.trick import Trick
 
+
 class Hand:
     def __init__(self, cards: list[Card]):
         self.cards = sorted(self.sort_hand(cards))
 
     def __len__(self) -> int:
         return len(self.cards)
-    
+
+    def __getitem__(self, key: int) -> Card:
+        return self.cards[key]
+
     def __iter__(self) -> Iterator:
         return iter(self.cards)
-    
+
     def __str__(self):
         return "\n".join(["-" * 15] + list((map(str, self.cards))) + ["-" * 15])
 
@@ -57,11 +61,11 @@ class Hand:
             # must follow suit, if leading then lead_suit is None
             return [card for card in self.cards if card.suit == trick.lead_suit]
         else:
-            self.cards
+            return self.cards[:]  # copy of self.cards
 
     def pop(self, index: int) -> Card:
         return self.cards.pop(index)
-    
+
     def play_card(self, card: Card) -> Card:
         """
         Remove the selected card from the hand and return it
@@ -69,5 +73,3 @@ class Hand:
         raises ValueError if card not in hand
         """
         return self.cards.pop(self.cards.index(card))
-
-    
