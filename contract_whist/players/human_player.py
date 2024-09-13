@@ -21,12 +21,14 @@ class HumanPlayer(Player):
                 bid = int(input(f"Choose your bid from {options}: "))
             except Exception:
                 print("invalid")
+        self.contract = bid
         return bid
 
     def play_card(self, trick: Trick) -> Card:
         playable = self.hand.playable(trick)
-        print(f"{self.hand=}")
-        print(f"{self.name} choose from: played so far: {trick.cards}")
+        print(
+            f"{self.name} choose from ({self.trick_count} / {self.contract}): played so far: {trick.cards}"
+        )
         for i, card in enumerate(self.hand):
             print(f"{i:2d}" if card in playable else "  ", f" | {card}")
         index = -1
