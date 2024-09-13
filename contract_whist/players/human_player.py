@@ -25,6 +25,7 @@ class HumanPlayer(Player):
 
     def play_card(self, trick: Trick) -> Card:
         playable = self.hand.playable(trick)
+        print(f"{self.hand=}")
         print(f"{self.name} choose from: played so far: {trick.cards}")
         for i, card in enumerate(self.hand):
             print(f"{i:2d}" if card in playable else "  ", f" | {card}")
@@ -36,4 +37,5 @@ class HumanPlayer(Player):
                 index = int(input("choose index: "))
             except Exception:
                 print("invalid")
-        return self.hand.pop(index)
+        card = self.hand[index]
+        return self.hand.play_card(card)
