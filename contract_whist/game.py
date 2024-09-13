@@ -35,12 +35,12 @@ class Game:
         options = set(range(len(hands[0]) + 1))
         bids = {}
         for player, hand in zip(players, hands):
-            print(f"{player.name} to bid.")
             player.hand = hand
             if player is players[-1]:  # dealer
                 if (forbidden := len(hands[0]) - sum(bids.values())) >= 0:
                     options.remove(forbidden)
-            bids[player] = player.make_bid(options)
+            print(f"{player.name} to bid: {(bid := player.make_bid(options))}")
+            bids[player] = bid
         return bids
 
     def play_round(self, num_tricks: int, trump: str | None) -> dict[Player, int]:
@@ -49,13 +49,13 @@ class Game:
             - Deal a hand to each player
             - Collect the bids
             - Lay cards
-            - total scores
+            - Total scores
         """
         self.DECK.set_trump(trump)
         hands = self.DECK.shuffle_and_deal(
             num_cards=num_tricks, num_players=self.num_players
         )
-        bids = self.get_bids(hands)
+        bids = self.get_bids([Hand(cards) for cards in hands])
         for player, bid in bids.items():
             print(f"{player.name:<20s} | {bid:2d}")
 
@@ -64,7 +64,7 @@ class Game:
         leader_index = 0
         for trick_number in range(num_tricks):
             print(f"trick {trick_number + 1}:")
-            trick = Trick(trump)
+            trick = Trick()
             for player in self.players[leader_index:] + self.players[:leader_index]:
                 trick.add_card(player, player.play_card(trick))
 
@@ -82,10 +82,11 @@ class Game:
         Play the specified number of rounds, adding the scores
         """
         hands = [12, 10, 8, 6, 4, 2, 1, 3, 5, 7, 9, 11, 13]
-        #hands = [4, 2, 1, 3, 5]
+        # hands = [4, 2, 1, 3, 5]
         for i, hand in enumerate(hands):
             trump = next(self.SUIT_ORDER)
-            print(f"Round {i + 1}: {hand} cards, {trump}s are trumps")
+            trump_message = "no trumps" if trump is None else f"{trump}s are trumps"
+            print(f"Round {i + 1}: {hand} cards, {trump_message}")
             print(f"{self.players[-1].name} is dealing")
             round_result = self.play_round(num_tricks=hand, trump=trump)
             for player, score in round_result.items():
