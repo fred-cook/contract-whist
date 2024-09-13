@@ -8,11 +8,23 @@ SUITS = ("club", "diamond", "heart", "spade")
 
 
 class Card:
+    """
+    Each card is a singleton
+    """
+
     TRUMP: str | None = None
+    _instances: dict[tuple[str, IntEnum], "Card"] = {}
+
+    def __new__(cls, suit: str, value: IntEnum):
+        if (suit, value) not in cls._instances:
+            instance = super().__new__(cls)
+            cls._instances[(suit, value)] = instance
+        return cls._instances[(suit, value)]
 
     def __init__(self, suit: str, value: IntEnum):
-        self.suit = suit
-        self.value = value
+        if not hasattr(self, suit):
+            self.suit = suit
+            self.value = value
 
     def __repr__(self):
         return f"{self.value.name} of {self.suit}s"
