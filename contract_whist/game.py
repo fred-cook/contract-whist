@@ -69,6 +69,8 @@ class Game:
                 trick.add_card(player, player.play_card(trick))
 
             winner = trick.resolve()
+            for player in players:
+                player.update_trick_result(trick)
             leader_index = self.players.index(winner)
             tricks[winner] += 1
 
