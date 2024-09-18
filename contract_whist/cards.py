@@ -27,7 +27,7 @@ class Card:
         if not hasattr(self, suit):
             self.suit = suit
             self.value = value
-            self.index = next(self._index_counter)
+            self.index = next(self._index_counter)  # for 1 hot encoding
 
     def __repr__(self):
         return f"{self.value.name} of {self.suit}s"
