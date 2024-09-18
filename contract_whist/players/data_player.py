@@ -14,8 +14,8 @@ class DataPlayer(HeuristicPlayer):
         card_multiplier: float,
         card_cutoff: int,
     ):
-        state_vectors: list[list[float]] = []
-        play_vectors: list[int] = []
+        self.state_vectors: list[list[int | float]] = []
+        self.play_indices: list[int] = []
 
         super().__init__(name, trump_multiplier, card_multiplier, card_cutoff)
 
@@ -59,9 +59,14 @@ class DataPlayer(HeuristicPlayer):
         """
         return np.ndarray([1 if suit == Card.TRUMP else 0
                            for suit in SUITS])
+    
+    def round_reset(self) -> None:
+        self.state_vectors = []
+        self.play_indices = []
+        return super().round_reset()
 
     def play_card(self, trick: Trick) -> Card:
         self.state_vectors.append(self.generate_vector(trick))
         card = super().play_card(trick)
-        self.play_vectors.append(card.index)
+        self.play_indices.append(card.index)
         return card
