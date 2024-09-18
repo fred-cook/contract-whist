@@ -10,6 +10,7 @@ from contract_whist.trick import Trick
 class Hand:
     def __init__(self, cards: list[Card]):
         self.cards = sorted(self.sort_hand(cards))
+        self.total = len(cards)
 
     def __len__(self) -> int:
         return len(self.cards)
