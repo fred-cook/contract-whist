@@ -18,9 +18,7 @@ class Game:
 
     def __init__(self, players: list[Player]):
         self.players = players
-
-        self.bids: dict[str, int] | None = None
-        self.rounds = list(range(7, 0, -2)) + list(range(2, 8, 2))
+        self.hands = [12, 10, 8, 6, 4, 2, 1, 3, 5, 7, 9, 11, 13]
 
     @property
     def num_players(self) -> int:
@@ -55,8 +53,8 @@ class Game:
         hands = self.DECK.shuffle_and_deal(
             num_cards=num_tricks, num_players=self.num_players
         )
-        bids = self.get_bids([Hand(cards) for cards in hands])
-        for player, bid in bids.items():
+        contracts = self.get_bids([Hand(cards) for cards in hands])
+        for player, bid in contracts.items():
             print(f"{player.name:<20s} | {bid:2d}")
 
         tricks: dict[Player, int] = {player: 0 for player in self.players}
@@ -75,16 +73,14 @@ class Game:
             tricks[winner] += 1
 
         return {
-            player: score + self.CONTRACT_BONUS if score == bids[player] else score
+            player: score + self.CONTRACT_BONUS if score == contracts[player] else score
             for player, score in tricks.items()
         }
 
-    def play_game(self) -> None:
+    def play_game(self, hands: list[int]) -> None:
         """
-        Play the specified number of rounds, adding the scores
+        Play the specified number of hands, adding the scores
         """
-        hands = [12, 10, 8, 6, 4, 2, 1, 3, 5, 7, 9, 11, 13]
-        # hands = [4, 2, 1, 3, 5]
         for i, hand in enumerate(hands):
             trump = next(self.SUIT_ORDER)
             trump_message = "no trumps" if trump is None else f"{trump}s are trumps"
@@ -110,7 +106,7 @@ players = [HumanPlayer("Fred")] + [
     HeuristicPlayer(name, 1.05, 0.35, 6) for name in ("Joe", "Tim", "Cookie")
 ]
 game = Game(players)
-game.play_game()
+game.play_game(game.hands)
 
 # if __name__ == "__main__":
 #     trump_multipliers = np.linspace(0.95, 1.3, 10)
