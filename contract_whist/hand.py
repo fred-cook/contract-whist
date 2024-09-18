@@ -26,6 +26,10 @@ class Hand:
 
     def __repr__(self):
         return str(self)
+    
+    @property
+    def trick_fraction(self) -> float:
+        return (self.total - len(self)) / self.total
 
     @staticmethod
     def sort_hand(cards: list[Card]) -> list[Card]:
