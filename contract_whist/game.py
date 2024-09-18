@@ -26,7 +26,7 @@ class Game:
     def num_players(self) -> int:
         return len(self.players)
 
-    def get_bids(self, hands: list[Hand]) -> dict[str, int]:
+    def get_bids(self, hands: list[Hand]) -> dict[Player, int]:
         """
         Get the bids in current playing order, with
         the exception that the sum of the bids can't
