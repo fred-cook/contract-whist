@@ -8,6 +8,7 @@ packages = [{include = "contract_whist"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+torch = "^2.4.1"
 
 
 [tool.poetry.group.dev.dependencies]
