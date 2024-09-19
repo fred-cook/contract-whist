@@ -4,6 +4,7 @@ import numpy as np
 from contract_whist.game import Game
 from contract_whist.players import DataPlayer
 
+
 class HarvestData(Game):
     def __init__(self, players: list[DataPlayer]):
         self.input_vectors: list[np.ndarray] = []
@@ -13,8 +14,7 @@ class HarvestData(Game):
 
     def play_round(self, num_tricks: int, trump: str | None) -> dict[DataPlayer, int]:
 
-        result = super().play_round(num_tricks, trump)
-
+        round_result = super().play_round(num_tricks, trump)
 
         # extract and process the vectors
         for player in self.players:
@@ -29,10 +29,9 @@ class HarvestData(Game):
             self.input_vectors.append(np.array(player.state_vectors))
             self.output_vectors.append(played_vectors)
 
-        return result
+        return round_result
 
 
-players = [DataPlayer(name, 1.05, 0.35, 6)
-           for name in ("Fred", "Murray", "Sam", "Tim")]
+players = [DataPlayer(name, 1.05, 0.35, 6) for name in ("Fred", "Murray", "Sam", "Tim")]
 data_game = HarvestData(players)
 data_game.play_game([5])
