@@ -1,11 +1,12 @@
 import numpy as np
 
-from contract_whist.cards import Card, SUITS
+from contract_whist.cards import Card, SUITS, Deck
 from contract_whist.trick import Trick
 from contract_whist.players import HeuristicPlayer
 
 
 class DataPlayer(HeuristicPlayer):
+    DECK = Deck()
 
     def __init__(
         self,
@@ -18,7 +19,6 @@ class DataPlayer(HeuristicPlayer):
         self.play_indices: list[int] = []
 
         super().__init__(name, trump_multiplier, card_multiplier, card_cutoff)
-
 
     def generate_vector(self, trick: Trick) -> list[int | float]:
         """
@@ -51,15 +51,14 @@ class DataPlayer(HeuristicPlayer):
         for i, card in enumerate(cards):
             vector[card.index] = 2 if ordered and i == 0 else 1
         return vector
-    
+
     def get_trump_vector(self) -> list[int]:
         """
         One hot encoding for what is trumps, all
         0 if no trumps.
         """
-        return np.ndarray([1 if suit == Card.TRUMP else 0
-                           for suit in SUITS])
-    
+        return [1 if suit == Card.TRUMP else 0 for suit in SUITS]
+
     def round_reset(self) -> None:
         self.state_vectors = []
         self.play_indices = []
