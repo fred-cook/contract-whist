@@ -32,9 +32,9 @@ class Game:
         """
         options = set(range(len(hands[0]) + 1))
         bids = {}
-        for player, hand in zip(players, hands):
+        for player, hand in zip(self.players, hands):
             player.hand = hand
-            if player is players[-1]:  # dealer
+            if player is self.players[-1]:  # dealer
                 if (forbidden := len(hands[0]) - sum(bids.values())) >= 0:
                     options.remove(forbidden)
             print(f"{player.name} to bid: {(bid := player.make_bid(options))}")
@@ -67,7 +67,7 @@ class Game:
                 trick.add_card(player, player.play_card(trick))
 
             winner = trick.resolve()
-            for player in players:
+            for player in self.players:
                 player.update_trick_result(trick)
             leader_index = self.players.index(winner)
             tricks[winner] += 1
@@ -94,7 +94,7 @@ class Game:
         print("Final scores:")
         for player in self.players:
             print(f"{player.name:10s} | {player.points:3d}")
-        return {player.name: player.points for player in players}
+        return {player.name: player.points for player in self.players}
 
     @staticmethod
     def new_leader(winner: Player, players: list[Player]) -> list[Player]:
@@ -102,13 +102,13 @@ class Game:
         return players[index:] + players[:index]
 
 
-players = [HumanPlayer("Fred")] + [
-    HeuristicPlayer(name, 1.05, 0.35, 6) for name in ("Joe", "Tim", "Cookie")
-]
-game = Game(players)
-game.play_game(game.hands)
+if __name__ == "__main__":
+    players = [HumanPlayer("Fred")] + [
+        HeuristicPlayer(name, 1.05, 0.35, 6) for name in ("Joe", "Tim", "Cookie")
+    ]
+    game = Game(players)
+    game.play_game(game.hands)
 
-# if __name__ == "__main__":
 #     trump_multipliers = np.linspace(0.95, 1.3, 10)
 #     card_multipliers = np.linspace(0.1, 0.5, 10)
 
