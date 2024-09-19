@@ -20,6 +20,7 @@ class Card:
     def __new__(cls, suit: str, value: IntEnum):
         if (suit, value) not in cls._instances:
             instance = super().__new__(cls)
+            instance.index = next(cls._index_counter)  # for 1 hot encoding
             cls._instances[(suit, value)] = instance
         return cls._instances[(suit, value)]
 
@@ -27,7 +28,6 @@ class Card:
         if not hasattr(self, suit):
             self.suit = suit
             self.value = value
-            self.index = next(self._index_counter)  # for 1 hot encoding
 
     def __repr__(self):
         return f"{self.value.name} of {self.suit}s"
