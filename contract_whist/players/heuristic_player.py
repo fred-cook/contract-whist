@@ -36,13 +36,15 @@ class HeuristicPlayer(Player):
         """
         score = self.evaluate_hand(self.hand)
         if round(score) in options:
-            return round(score)
+            bid = round(score)
         elif round(score) > max(options):
-            return max(options)
+            bid = max(options)
         else:
             options = list(options)
             diffs = [abs(score - option) for option in options]
-            return options[diffs.index(min(diffs))]
+            bid = options[diffs.index(min(diffs))]
+        self.contract = bid
+        return bid
 
     def play_card(self, trick: Trick) -> Card:
         """
