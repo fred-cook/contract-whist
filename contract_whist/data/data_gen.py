@@ -34,4 +34,4 @@ class HarvestData(Game):
 
 players = [DataPlayer(name, 1.05, 0.35, 6) for name in ("Fred", "Murray", "Sam", "Tim")]
 data_game = HarvestData(players)
-data_game.play_game([5])
+data_game.play_game([5, 5, 5])

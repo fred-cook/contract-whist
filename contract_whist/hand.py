@@ -28,7 +28,7 @@ class Hand:
         return str(self)
     
     @property
-    def trick_fraction(self) -> float:
+    def trick_proportion(self) -> float:
         return (self.total - len(self)) / self.total
 
     @staticmethod

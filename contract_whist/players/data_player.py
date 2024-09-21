@@ -23,21 +23,23 @@ class DataPlayer(HeuristicPlayer):
     def generate_vector(self, trick: Trick) -> list[int | float]:
         """
         The state vector is:
-        + Current hand    |  [52]
-        + All cards seen  |  [52]
-        + Current trick   |  [52]
-        + Contract        |  [01]
-        + Tricks won      |  [01]
-        + Trick fraction  |  [01]
-        + Trump           |  [04]
-        ------------------+------
-                          |  163
+        + Current hand     |  [52]
+        + All cards seen   |  [52]
+        + Current trick    |  [52]
+        + Contract         |  [01]
+        + Tricks won       |  [01]
+        + Trick proportion |  [01]
+        + Total tricks     |  [01]
+        + Trump            |  [04]
+        -------------------+------
+                           |  163
         """
         return (
             self.get_card_vector(self.hand.cards)
             + self.get_card_vector(self.cards_seen)
             + self.get_card_vector(trick.cards, ordered=True)
-            + [self.contract, self.trick_count, self.hand.trick_fraction]
+            + [self.contract, self.trick_count]
+            + [self.hand.trick_proportion, self.hand.total]
             + self.get_trump_vector()
         )
 
