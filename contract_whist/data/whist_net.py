@@ -47,22 +47,6 @@ model = WhistNet(input_size, hidden_size, output_size)
 criterion = nn.CrossEntropyLoss()  # Loss function for classification
 optimizer = optim.Adam(model.parameters(), lr=0.001)  # Adam optimizer
 
-def squared_error_masked(y_true, y_pred, scale_factor=1.0):
-    """ Squared error of elements where y_true is not 0 (masked) """
-    
-    # Ensure y_true and y_pred are of the same dtype
-    y_true = y_true.to(y_pred.dtype)
-
-    # Calculate the error with scale factor
-    err = y_pred - (y_true * scale_factor)
-
-    # Create a mask for elements where y_true is not zero
-    mask = (y_true != 0).to(y_pred.dtype)
-
-    # Compute squared error, apply mask, and sum across the last dimension
-    squared_err = (err ** 2) * mask
-    return torch.sum(squared_err, dim=-1)
-
 # Training loop
 num_epochs = 10  # Set the number of epochs
 for epoch in range(num_epochs):
@@ -72,7 +56,6 @@ for epoch in range(num_epochs):
         outputs = model(game_state)
         
         # Compute the loss
-        criterion()
         loss = criterion(outputs, correct_action)  # correct_action is the index of the correct card
         
         # Backward pass and optimization
