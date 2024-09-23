@@ -2,7 +2,7 @@ import logging
 logging.basicConfig(level=logging.CRITICAL)
 
 import numpy as np
-#import tqdm
+import tqdm
 
 from contract_whist.game import Game
 from contract_whist.players import DataPlayer
@@ -32,14 +32,17 @@ class HarvestData(Game):
             self.input_vectors.append(np.array(player.state_vectors))
             self.output_vectors.append(played_vectors)
 
+            player.points = 0 # reset point score
+            player.hand = None # reset hand
         return round_result
 
+    def get_data(self, hands: list[int], num_games: int) -> tuple[np.ndarray, np.ndarray]:
+        """
+        Play `num_games` of `hands`
 
-players = [DataPlayer(name, 1.05, 0.35, 6) for name in ("Fred", "Murray", "Sam", "Tim")]
-data_game = HarvestData(players)
-
-for _ in range(10):
-    data_game.play_game([7, 7, 7, 7, 7])
-
-input_vectors = np.concatenate(data_game.input_vectors)
-output_vectors = np.concatenate(data_game.output_vectors)
+        Return the input and output vectors
+        """
+        for _ in tqdm.tqdm(range(num_games)):
+            self.play_game(hands)
+        
+        return np.concat(self.input_vectors), np.concat(self.output_vectors)

@@ -2,15 +2,25 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
+import numpy as np
+
+from contract_whist.players import DataPlayer
+from contract_whist.data.data_gen import HarvestData
 
 # Create a dataset (X_train: game states, y_train: correct cards to play)
 # X_train: shape [num_samples, input_size]
 # y_train: shape [num_samples] (indices of the correct card to play, not one-hot encoded)
-X_train = torch.rand(1000, 163)  # Example random data, replace with your real game state data
-y_train = torch.randint(0, 52, (1000,))  # Example random target data, replace with your labels
+
+players = [
+    DataPlayer(name, 1.05, 0.35, 6)
+    for name in ("Fred", "Murray", "Sam", "Tim")
+]
+X_train, y_train = HarvestData(players).get_data(hands=[7, 7, 7, 7, 7],
+                                                 num_games=1000)
 
 # Create a DataLoader to handle batching
-train_dataset = TensorDataset(X_train, y_train)
+train_dataset = TensorDataset(torch.from_numpy(X_train.astype(np.float32)),
+                              torch.from_numpy(y_train.astype(np.float32)))
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 
 # Define the neural network
@@ -28,9 +38,9 @@ class WhistNet(nn.Module):
         return x
 
 # Hyperparameters
-input_size = 163  # Size of the input vector (game state encoding)
+_, input_size = X_train.shape  # Size of the input vector (game state encoding)
 hidden_size = 128  # Number of neurons in the hidden layers
-output_size = 52   # Number of possible cards to play (or bids, etc.)
+_, output_size = y_train.shape   # Number of possible cards to play (or bids, etc.)
 
 # Initialize the model, loss function, and optimizer
 model = WhistNet(input_size, hidden_size, output_size)
