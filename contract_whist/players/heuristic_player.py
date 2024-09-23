@@ -1,3 +1,5 @@
+import logging
+
 from contract_whist.cards import Card
 from contract_whist.trick import Trick
 from contract_whist.hand import Hand
@@ -62,26 +64,26 @@ class HeuristicPlayer(Player):
         """
         playable = self.hand.playable(trick)
         if len(playable) == 1:
-            print(f"{self.name} has no choice: {playable[0]} from {self.hand.cards}")
+            logging.debug(f"{self.name} has no choice: {playable[0]} from {self.hand.cards}")
             card = playable.pop()
         elif self.trick_count == self.contract:  # try and throw away cards
             if len(trick) == 0:  # playing first
                 card = self.min_face_card(playable)
-                print(f"{self.name} trying to lose with {card} from {self.hand.cards}")
+                logging.debug(f"{self.name} trying to lose with {card} from {self.hand.cards}")
             else:
                 card = self.max_losing_card(playable, trick)
-                print(
+                logging.debug(
                     f"{self.name} playing highest losing card from {self.hand.cards}: {card}"
                 )
         else:  # try and win it
             if len(trick) == 0:  # playing first
                 card = self.max_face_card(playable)
-                print(f"{self.name} trying to win with {card} from {self.hand.cards}")
+                logging.debug(f"{self.name} trying to win with {card} from {self.hand.cards}")
             elif (card := self.can_win(playable, trick)) is not None:
-                print(f"{self.name} trying to win from {self.hand.cards} with {card}")
+                logging.debug(f"{self.name} trying to win from {self.hand.cards} with {card}")
             else:
                 card = self.min_face_card(playable)
-                print(
+                logging.debug(
                     f"{self.name} can't win, throwing away {card} for {self.hand.cards}"
                 )
         return self.hand.play_card(card)

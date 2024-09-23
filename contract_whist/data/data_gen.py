@@ -1,5 +1,8 @@
-import numpy as np
+import logging
+logging.basicConfig(level=logging.CRITICAL)
 
+import numpy as np
+#import tqdm
 
 from contract_whist.game import Game
 from contract_whist.players import DataPlayer
@@ -34,4 +37,9 @@ class HarvestData(Game):
 
 players = [DataPlayer(name, 1.05, 0.35, 6) for name in ("Fred", "Murray", "Sam", "Tim")]
 data_game = HarvestData(players)
-data_game.play_game([5, 5, 5])
+
+for _ in range(10):
+    data_game.play_game([7, 7, 7, 7, 7])
+
+input_vectors = np.concatenate(data_game.input_vectors)
+output_vectors = np.concatenate(data_game.output_vectors)

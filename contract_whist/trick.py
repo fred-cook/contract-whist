@@ -1,6 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
+import logging
+logging.basicConfig(level=logging.CRITICAL)
+
 from contract_whist.cards import Card
 if TYPE_CHECKING:
     from contract_whist.players import Player
@@ -43,10 +46,10 @@ class Trick:
         and resulting winner.
         """
         for player, card in zip(self.players, self.cards):
-            print(f"{player.name:10s} | {card}")
+            logging.info(f"{player.name:10s} | {card}")
         winning_card = self.winning_card(self.cards)
         self.winner = self.players[self.cards.index(winning_card)]
-        print(f"{self.winner.name} wins with the {winning_card}")
+        logging.info(f"{self.winner.name} wins with the {winning_card}")
         return self.winner
 
     @staticmethod

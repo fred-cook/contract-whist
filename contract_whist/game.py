@@ -1,4 +1,6 @@
 from itertools import cycle
+import logging
+logging.basicConfig(level=logging.CRITICAL)
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -37,7 +39,7 @@ class Game:
             if player is self.players[-1]:  # dealer
                 if (forbidden := len(hands[0]) - sum(bids.values())) >= 0:
                     options.remove(forbidden)
-            print(f"{player.name} to bid: {(bid := player.make_bid(options))}")
+            logging.info(f"{player.name} to bid: {(bid := player.make_bid(options))}")
             bids[player] = bid
         return bids
 
@@ -55,13 +57,13 @@ class Game:
         )
         contracts = self.get_bids([Hand(cards) for cards in hands])
         for player, bid in contracts.items():
-            print(f"{player.name:<20s} | {bid:2d}")
+            logging.info(f"{player.name:<20s} | {bid:2d}")
 
         tricks: dict[Player, int] = {player: 0 for player in self.players}
 
         leader_index = 0
         for trick_number in range(num_tricks):
-            print(f"trick {trick_number + 1}:")
+            logging.info(f"trick {trick_number + 1}:")
             trick = Trick()
             for player in self.players[leader_index:] + self.players[:leader_index]:
                 trick.add_card(player, player.play_card(trick))
@@ -84,16 +86,16 @@ class Game:
         for i, hand in enumerate(hands):
             trump = next(self.SUIT_ORDER)
             trump_message = "no trumps" if trump is None else f"{trump}s are trumps"
-            print(f"Round {i + 1}: {hand} cards, {trump_message}")
-            print(f"{self.players[-1].name} is dealing")
+            logging.info(f"Round {i + 1}: {hand} cards, {trump_message}")
+            logging.info(f"{self.players[-1].name} is dealing")
             round_result = self.play_round(num_tricks=hand, trump=trump)
             for player, score in round_result.items():
-                print(f"{player.name:10s} | {score:2d}")
+                logging.info(f"{player.name:10s} | {score:2d}")
                 player.update_score(score)
             self.players.append(self.players.pop(0))  # next dealer
-        print("Final scores:")
+        logging.info("Final scores:")
         for player in self.players:
-            print(f"{player.name:10s} | {player.points:3d}")
+            logging.info(f"{player.name:10s} | {player.points:3d}")
         return {player.name: player.points for player in self.players}
 
     @staticmethod
@@ -103,11 +105,12 @@ class Game:
 
 
 if __name__ == "__main__":
+    logging.getLogger().setLevel(logging.DEBUG)
     players = [HumanPlayer("Fred")] + [
         HeuristicPlayer(name, 1.05, 0.35, 6) for name in ("Joe", "Tim", "Cookie")
     ]
     game = Game(players)
-    game.play_game(game.hands)
+    game.play_game([7, 5])
 
 #     trump_multipliers = np.linspace(0.95, 1.3, 10)
 #     card_multipliers = np.linspace(0.1, 0.5, 10)

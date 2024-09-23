@@ -1,8 +1,10 @@
-import numpy as np
+import logging
+logging.basicConfig(level=logging.CRITICAL)
 
 from contract_whist.cards import Card, SUITS, Deck
 from contract_whist.trick import Trick
 from contract_whist.players import HeuristicPlayer
+from contract_whist.data.vector import GameStateVector
 
 
 class DataPlayer(HeuristicPlayer):
@@ -18,6 +20,8 @@ class DataPlayer(HeuristicPlayer):
         self.state_vectors: list[list[int | float]] = []
         self.play_indices: list[int] = []
 
+        self.vector = GameStateVector
+
         super().__init__(name, trump_multiplier, card_multiplier, card_cutoff)
 
     def generate_vector(self, trick: Trick) -> list[int | float]:
@@ -32,7 +36,7 @@ class DataPlayer(HeuristicPlayer):
         + Total tricks     |  [01]
         + Trump            |  [04]
         -------------------+------
-                           |  163
+                           |  164
         """
         return (
             self.get_card_vector(self.hand.cards)
@@ -67,7 +71,7 @@ class DataPlayer(HeuristicPlayer):
         return super().round_reset()
 
     def play_card(self, trick: Trick) -> Card:
-        self.state_vectors.append(self.generate_vector(trick))
+        self.state_vectors.append(self.vector.generate_vector(self, trick))
         card = super().play_card(trick)
         self.play_indices.append(card.index)
         return card
